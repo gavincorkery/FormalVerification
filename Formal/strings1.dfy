@@ -1,3 +1,8 @@
+// CS4004 Project Part 1: Programming
+// Due: 27/10/2017
+// Authors: Gavin Corkery, Sean Durban
+// I spent 1hr total on 1 & 4
+// Average time spent :
 method isPrefix(pre: string, str: string) returns (res:bool)
 {
     if(|pre| > |str|){
@@ -6,7 +11,7 @@ method isPrefix(pre: string, str: string) returns (res:bool)
     return str[..|pre|] == pre;
 }
 
-method isSubstring(sub:string, str:string) returns(res:bool)  
+method isSubstring(sub:string, str:string) returns(res:bool)
 {
   var i:= 0;
   while(i<|str|){
@@ -18,7 +23,7 @@ method isSubstring(sub:string, str:string) returns(res:bool)
     i := i + 1;
   }
   return false;
-}  
+}
 
 method haveCommonKSubstring(k: nat, str1: string, str2: string) returns (found: bool)
 {
@@ -34,17 +39,17 @@ method haveCommonKSubstring(k: nat, str1: string, str2: string) returns (found: 
         if(substringFound)
         {
             return true;
-        } 
+        }
     }
     return false;
 }
 
-method maxCommonSubstringLength(str1: string, str2: string) returns (len:nat) 
+method maxCommonSubstringLength(str1: string, str2: string) returns (len:nat)
 {
 	var maxLen:= |str1|;
-	while(maxLen>0) 
+	while(maxLen>0)
     {
-        var commonSubstringFound := haveCommonKSubstring(maxLen, str1, str2);
+    var commonSubstringFound := haveCommonKSubstring(maxLen, str1, str2);
 		if(commonSubstringFound){
 			return maxLen;
 		}
