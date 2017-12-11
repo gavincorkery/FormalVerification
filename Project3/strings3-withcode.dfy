@@ -24,14 +24,17 @@ method isPrefix(pre: string, str: string) returns (res:bool)
 	var i := 0;
 	res := true;
 	while (i < |pre| && res)
-	  invariant true // TODO: change to a meaningful invariant. You can add multiple invariant lines
-	  decreases 0    // TODO: change to a meaningful variant.
+	  invariant 0 <= i <= |pre| <= |str|
+	  invariant res ==> pre[..i] == str[..i]
+	  invariant !res ==> pre != str[..|pre|]
+	  decreases |pre| - i - (if res then 0 else 1);
 	{
 		if (pre[i] != str[i]) { res := false; }
-		else { i := i + 1; }
+		else {
+		 i := i + 1; 
+		}
 	}
 }
-
 predicate isSubstringPred(sub:string, str:string)
 {
 	(exists i :: 0 <= i <= |str| &&  isPrefixPred(sub, str[i..]))
@@ -55,14 +58,15 @@ method isSubstring(sub: string, str: string) returns (res:bool)
 	var i := 0;
 	res := false;
 	while (i <= |str|-|sub| && !res) 
-	  invariant true // TODO: change to a meaningful invariant. You can add multiple invariant lines
-	  decreases 0    // TODO: change to a meaningful variant.
+	  decreases |str|-|sub| - i - (if res then 1 else 0);
+	  invariant 0 <= i <= |str| - |sub| + 1
+	  invariant res ==> exists j :: 0 <= j <= |str| &&  isPrefixPred(sub, str[j..])
+	  invariant !res ==> forall j :: 0 <= j < i ==> isNotPrefixPred(sub, str[j..])
   {
 		res := isPrefix(sub, str[i..]);
 		if (!res) {	i := i + 1;	}
 	}
 }
-
 
 predicate haveCommonKSubstringPred(k:nat, str1:string, str2:string)
 {
@@ -92,13 +96,16 @@ method haveCommonKSubstring(k: nat, str1: string, str2: string) returns (found: 
 	found := false;
 	var i := 0;
 	while (i <= |str1| - k && !found)
-	  invariant true // TODO: change to a meaningful invariant. You can add multiple invariant lines
-	  decreases 0    // TODO: change to a meaningful variant.
+	  invariant 0 <= i <= |str1| - k + 1
+	  invariant found ==> haveCommonKSubstringPred(k, str1, str2)
+	  invariant !found ==> forall i1, j1 :: 0 <= i1 < i && j1 == i1 + k ==>  isNotSubstringPred(str1[i1..j1],str2)
+	  decreases |str1| - k - i - (if found then 1 else 0)
 	{
 		found := isSubstring(str1[i..i+k], str2);
 		if (!found) { i := i+1; }
 	}
 }
+
 
 method maxCommonSubstringLength(str1: string, str2: string) returns (len:nat)
 	requires (|str1| <= |str2|)
@@ -108,8 +115,10 @@ method maxCommonSubstringLength(str1: string, str2: string) returns (len:nat)
 	len := |str1|;
 	var found : bool := false;
 	while (0 < len && !found)
-	  invariant true // TODO: change to a meaningful invariant. You can add multiple invariant lines
-	  decreases 0    // TODO: change to a meaningful variant.
+	  invariant 0 <= len <= |str1|
+	  invariant found ==> haveCommonKSubstringPred(len,str1,str2)
+	  invariant forall k :: len < k <= |str1| ==> !haveCommonKSubstringPred(k, str1, str2)
+	  decreases len - (if found then 1 else 0)
 	{
 		found := haveCommonKSubstring(len, str1, str2);
 		if !found {	len := len - 1; }
@@ -118,5 +127,6 @@ method maxCommonSubstringLength(str1: string, str2: string) returns (len:nat)
 	assert isPrefixPred(str1[0..0],str2[0..]);
 	return len;
 }
+
 
 
